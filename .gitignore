@@ -1,0 +1,9 @@
+# clangd
+.cache/
+compile_commands.json
+
+# meson
+build/
+
+# macOS
+.DS_Store
