@@ -1,6 +1,8 @@
+#include <cstring>
 #include <filesystem>
 #include <glm/glm.hpp>
 #include <iostream>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -9,11 +11,13 @@
 #include "scad.h"
 #include "transform.h"
 
+#define IS_OPT(ARG, LONG, SHORT) (strcmp(LONG, ARG) == 0 || strcmp(SHORT, ARG) == 0)
+
 using namespace scad;
 
-constexpr bool kWriteTestKeys = false;
+bool generateTestKeys = false;
 // Add the caps into the stl for testing.
-constexpr bool kAddCaps = false;
+bool addCaps = false;
 
 enum class Direction { UP, DOWN, LEFT, RIGHT };
 
@@ -25,7 +29,27 @@ void AddShapes(std::vector<Shape>* shapes, std::vector<Shape> to_add) {
 
 Shape ConnectMainKeys(KeyData& d);
 
-int main() {
+int main(int argc, char* argv[]) {
+    for (int i = 1; i < argc; i++) {
+        if (IS_OPT(argv[i], "--gen-test-keys", "-k")) {
+            generateTestKeys = true;
+        } else if (IS_OPT(argv[i], "--add-caps", "-c")) {
+            addCaps = true;
+        } else if (IS_OPT(argv[i], "--help", "-h")) {
+            std::cout << "Usage: dactyl [<options>]\n" << std::endl;
+            std::cout << "Options:" << std::endl;
+            std::cout << "  -k, --write-test-keys           Write test keys for debug purposes"
+                      << std::endl;
+            std::cout << "  -c, --add-caps                  Add caps for debug purposes"
+                      << std::endl;
+            std::cout << "  -h, --help                      Display help" << std::endl;
+            return 0;
+        } else {
+            std::cerr << "Unknown argument " << argv[i] << std::endl;
+            return -1;
+        }
+    }
+
     // Create "output" directory
     try {
         std::filesystem::create_directories("output/scad");
@@ -34,8 +58,6 @@ int main() {
         return 1;
     }
 
-    std::cout << "Generating..." << std::endl;
-
     TransformList key_origin;
     key_origin.Translate(-20, -40, 3);
 
@@ -43,20 +65,23 @@ int main() {
     // below is cosmetic trying to build the case.
     KeyData d(key_origin);
 
-    if (kWriteTestKeys) {
+    if (generateTestKeys) {
+        std::cout << "Generating test keys..." << std::endl;
         std::vector<Shape> test_shapes;
         std::vector<Key*> test_keys = {&d.key_3, &d.key_e, &d.key_4, &d.key_5, &d.key_d};
         for (Key* key : test_keys) {
             key->add_side_nub = false;
             key->extra_z = 4;
             test_shapes.push_back(key->GetSwitch());
-            if (kAddCaps) {
+            if (addCaps) {
                 test_shapes.push_back(key->GetCap().Color("red"));
             }
         }
-        UnionAll(test_shapes).WriteToFile("test_keys.scad");
-        return 0;
+        UnionAll(test_shapes).WriteToFile("output/scad/test_keys.scad");
+        std::cout << "Done." << std::endl;
     }
+
+    std::cout << "Generating cases..." << std::endl;
 
     // Set all of the widths here. This must be done before calling any of
     // GetTopLeft etc.
@@ -353,7 +378,7 @@ int main() {
 
     for (Key* key : d.all_keys()) {
         shapes.push_back(key->GetSwitch());
-        if (kAddCaps) {
+        if (addCaps) {
             shapes.push_back(key->GetCap().Color("red"));
         }
     }
@@ -423,6 +448,8 @@ int main() {
 
     result.WriteToFile("output/scad/left.scad");
     result.MirrorX().WriteToFile("output/scad/right.scad");
+
+    std::cout << "Done." << std::endl;
 
     // Bottom plate
     {
