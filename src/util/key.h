@@ -19,8 +19,8 @@ const double kSaHeight = 12.5;
 // This is the height of the taller side on the key. The short side has
 // kSaHeight.
 const double kSaEdgeHeight = 13.7;
-const double kDsaTopSize = 13.2;    // 0.5 * kMmPerInch;
-const double kDsaBottomSize = 18.4; // 0.725 * kMmPerInch;
+const double kDsaTopSize = 13.2;     // 0.5 * kMmPerInch;
+const double kDsaBottomSize = 18.4;  // 0.725 * kMmPerInch;
 // The size half way up the key used to generate the cap shape.
 const double kDsaHalfSize = 16.2;
 const double kSaHalfSize = 17.2;
@@ -37,16 +37,17 @@ const double kSwitchTipOffset = 10;
 
 enum class KeyType {
     DSA,
-    SA,           // Row 3
-    SA_EDGE,      // Row 2
-    SA_TALL_EDGE, // Row 1
+    SA,            // Row 3
+    SA_EDGE,       // Row 2
+    SA_TALL_EDGE,  // Row 1
 };
 // For SA edge variants. Which side of the key the edge should be rendered.
 enum class SaEdgeType { LEFT, RIGHT, TOP, BOTTOM };
 
 struct Key {
 public:
-    Key() {}
+    Key() {
+    }
 
     Key(double x, double y, double z) {
         t().x = x;
@@ -79,15 +80,21 @@ public:
     KeyType type = KeyType::DSA;
     SaEdgeType sa_edge_type = SaEdgeType::BOTTOM;
 
-    void Configure(std::function<void(Key &k)> fn) { fn(*this); }
+    void Configure(std::function<void(Key& k)> fn) {
+        fn(*this);
+    }
 
-    Key &SetPosition(double x, double y, double z);
-    Key &SetParent(const Key &key);
-    Key &SetParent(const TransformList &transforms);
+    Key& SetPosition(double x, double y, double z);
+    Key& SetParent(const Key& key);
+    Key& SetParent(const TransformList& transforms);
 
-    Transform &t() { return local_transforms.mutable_front(); }
+    Transform& t() {
+        return local_transforms.mutable_front();
+    }
 
-    Transform &AddTransform() { return local_transforms.AddTransformFront(); }
+    Transform& AddTransform() {
+        return local_transforms.AddTransformFront();
+    }
 
     TransformList GetTransforms() const;
     TransformList GetSwitchTransforms() const;
@@ -125,34 +132,36 @@ private:
 };
 
 struct KeyGrid {
-    explicit KeyGrid(std::vector<std::vector<Key *>> data)
-        : data(std::move(data)) {}
+    explicit KeyGrid(std::vector<std::vector<Key*>> data) : data(std::move(data)) {
+    }
 
-    std::vector<Key *> column(int c) {
-        std::vector<Key *> result;
-        for (auto &row : data) {
+    std::vector<Key*> column(int c) {
+        std::vector<Key*> result;
+        for (auto& row : data) {
             result.push_back(row[c]);
         }
         return result;
     }
 
-    std::vector<Key *> row(int r) { return data[r]; }
+    std::vector<Key*> row(int r) {
+        return data[r];
+    }
 
-    Key *get_key(size_t row, size_t column) {
+    Key* get_key(size_t row, size_t column) {
         if (row >= num_rows()) {
             return nullptr;
         }
-        auto &r = data[row];
+        auto& r = data[row];
         if (column >= r.size()) {
             return nullptr;
         }
         return r[column];
     }
 
-    std::vector<Key *> keys() {
-        std::vector<Key *> result;
-        for (auto &row : data) {
-            for (Key *key : row) {
+    std::vector<Key*> keys() {
+        std::vector<Key*> result;
+        for (auto& row : data) {
+            for (Key* key : row) {
                 if (key) {
                     result.push_back(key);
                 }
@@ -161,11 +170,15 @@ struct KeyGrid {
         return result;
     }
 
-    size_t num_columns() { return data[0].size(); }
+    size_t num_columns() {
+        return data[0].size();
+    }
 
-    size_t num_rows() { return data.size(); }
+    size_t num_rows() {
+        return data.size();
+    }
 
-    std::vector<std::vector<Key *>> data;
+    std::vector<std::vector<Key*>> data;
 };
 
 // Used to connect key corners together. It is thin so it can have width issues
@@ -173,35 +186,43 @@ struct KeyGrid {
 // another. (keys close together with vertical separation)
 Shape GetPostConnector();
 
-Shape ConnectVertical(const Key &top, const Key &bottom,
-                      Shape connector = GetPostConnector(), double offset = 0);
-Shape ConnectHorizontal(const Key &left, const Key &right,
+Shape ConnectVertical(const Key& top,
+                      const Key& bottom,
+                      Shape connector = GetPostConnector(),
+                      double offset = 0);
+Shape ConnectHorizontal(const Key& left,
+                        const Key& right,
                         Shape connector = GetPostConnector(),
                         double offset = 0);
-Shape ConnectDiagonal(const Key &top_left, const Key &top_right,
-                      const Key &bottom_right, const Key &bottom_left,
-                      Shape connector = GetPostConnector(), double offset = 0);
+Shape ConnectDiagonal(const Key& top_left,
+                      const Key& top_right,
+                      const Key& bottom_right,
+                      const Key& bottom_left,
+                      Shape connector = GetPostConnector(),
+                      double offset = 0);
 
-Shape Tri(const TransformList &t1, const TransformList &t2,
-          const TransformList &t3, Shape connector = GetPostConnector());
-Shape Tri(const Shape &s1, const Shape &s2, const Shape &s3);
+Shape Tri(const TransformList& t1,
+          const TransformList& t2,
+          const TransformList& t3,
+          Shape connector = GetPostConnector());
+Shape Tri(const Shape& s1, const Shape& s2, const Shape& s3);
 
-Shape TriHull(const TransformList &t1, const TransformList &t2,
-              const TransformList &t3, const TransformList &t4,
+Shape TriHull(const TransformList& t1,
+              const TransformList& t2,
+              const TransformList& t3,
+              const TransformList& t4,
               Shape connector = GetPostConnector());
-Shape TriHull(const Shape &s1, const Shape &s2, const Shape &s3,
-              const Shape &s4);
+Shape TriHull(const Shape& s1, const Shape& s2, const Shape& s3, const Shape& s4);
 
-Shape TriFan(const TransformList &center,
-             const std::vector<TransformList> &transforms,
+Shape TriFan(const TransformList& center,
+             const std::vector<TransformList>& transforms,
              Shape connector = GetPostConnector());
-Shape TriFan(Shape center, const std::vector<Shape> &shapes);
+Shape TriFan(Shape center, const std::vector<Shape>& shapes);
 
 // Makes a triangle with every consecutive set of 3 transforms. TriHull would be
 // the same as calling this with 4 transforms.
-Shape TriMesh(const std::vector<TransformList> &transforms,
-              Shape connector = GetPostConnector());
-Shape TriMesh(const std::vector<Shape> &shapes);
+Shape TriMesh(const std::vector<TransformList>& transforms, Shape connector = GetPostConnector());
+Shape TriMesh(const std::vector<Shape>& shapes);
 
 Shape MakeDsaCap();
 Shape MakeSaCap();
@@ -209,4 +230,4 @@ Shape MakeSaEdgeCap(SaEdgeType edge_type = SaEdgeType::BOTTOM);
 Shape MakeSaTallEdgeCap(SaEdgeType edge_type = SaEdgeType::BOTTOM);
 Shape MakeSwitch(bool add_side_nub = true);
 
-} // namespace scad
+}  // namespace scad

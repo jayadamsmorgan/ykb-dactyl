@@ -22,11 +22,13 @@ public:
     double ry = 0;
     double rz = 0;
 
-    Transform() {}
+    Transform() {
+    }
 
-    Transform(double x, double y, double z) : x(x), y(y), z(z) {}
+    Transform(double x, double y, double z) : x(x), y(y), z(z) {
+    }
 
-    Transform(const glm::vec3 &t) {
+    Transform(const glm::vec3& t) {
         x = t.x;
         y = t.y;
         z = t.z;
@@ -44,31 +46,33 @@ public:
         return t;
     }
 
-    glm::vec3 translation() const { return glm::vec3(x, y, z); }
+    glm::vec3 translation() const {
+        return glm::vec3(x, y, z);
+    }
 
-    Transform &SetRotationX(double rotation) {
+    Transform& SetRotationX(double rotation) {
         rx = rotation;
         return *this;
     }
 
-    Transform &SetRotationY(double rotation) {
+    Transform& SetRotationY(double rotation) {
         ry = rotation;
         return *this;
     }
 
-    Transform &SetRotationZ(double rotation) {
+    Transform& SetRotationZ(double rotation) {
         rz = rotation;
         return *this;
     }
 
-    Transform &SetRotation(double rx, double ry, double rz) {
+    Transform& SetRotation(double rx, double ry, double rz) {
         this->rx = rx;
         this->ry = ry;
         this->rz = rz;
         return *this;
     }
 
-    Shape Apply(const Shape &in) const {
+    Shape Apply(const Shape& in) const {
         Shape shape = in;
         if (rz != 0) {
             shape = shape.RotateZ(rz);
@@ -85,7 +89,7 @@ public:
         return shape;
     }
 
-    glm::vec3 Apply(const glm::vec3 &p) const;
+    glm::vec3 Apply(const glm::vec3& p) const;
 };
 
 // A list of transforms to apply to a shape or a point. The transforms are
@@ -94,80 +98,86 @@ public:
 // needs to be applied first and you must use a "front" method.
 class TransformList {
 public:
-    Shape Apply(const Shape &shape) const;
-    glm::vec3 Apply(const glm::vec3 &p) const;
+    Shape Apply(const Shape& shape) const;
+    glm::vec3 Apply(const glm::vec3& p) const;
 
-    Transform &AddTransform(Transform t = {}) {
+    Transform& AddTransform(Transform t = {}) {
         transforms_.push_back(t);
         return transforms_.back();
     }
 
-    Transform &AddTransformFront(Transform t = {}) {
+    Transform& AddTransformFront(Transform t = {}) {
         transforms_.insert(transforms_.begin(), t);
         return transforms_.front();
     }
 
-    bool empty() const { return transforms_.empty(); }
+    bool empty() const {
+        return transforms_.empty();
+    }
 
-    Transform &mutable_front() {
+    Transform& mutable_front() {
         if (empty()) {
             return AddTransform();
         }
         return transforms_.front();
     }
 
-    TransformList &RotateX(float deg) {
-        Transform &t = AddTransform();
+    TransformList& RotateX(float deg) {
+        Transform& t = AddTransform();
         t.rx = deg;
         return *this;
     }
 
-    TransformList &RotateY(float deg) {
-        Transform &t = AddTransform();
+    TransformList& RotateY(float deg) {
+        Transform& t = AddTransform();
         t.ry = deg;
         return *this;
     }
 
-    TransformList &RotateZ(float deg) {
-        Transform &t = AddTransform();
+    TransformList& RotateZ(float deg) {
+        Transform& t = AddTransform();
         t.rz = deg;
         return *this;
     }
 
-    TransformList &RotateFront(float rx, float ry, float rz) {
+    TransformList& RotateFront(float rx, float ry, float rz) {
         AddTransformFront(Transform::Rotation(rx, ry, rz));
         return *this;
     }
 
-    TransformList &TranslateFront(float x, float y, float z) {
+    TransformList& TranslateFront(float x, float y, float z) {
         AddTransformFront({x, y, z});
         return *this;
     }
 
-    TransformList &Translate(float x, float y, float z) {
+    TransformList& Translate(float x, float y, float z) {
         AddTransform({x, y, z});
         return *this;
     }
 
-    TransformList &Translate(const glm::vec3 &v) {
+    TransformList& Translate(const glm::vec3& v) {
         return Translate(v.x, v.y, v.z);
     }
 
-    TransformList &TranslateX(float x) { return Translate(x, 0, 0); }
+    TransformList& TranslateX(float x) {
+        return Translate(x, 0, 0);
+    }
 
-    TransformList &TranslateY(float y) { return Translate(0, y, 0); }
+    TransformList& TranslateY(float y) {
+        return Translate(0, y, 0);
+    }
 
-    TransformList &TranslateZ(float z) { return Translate(0, 0, z); }
+    TransformList& TranslateZ(float z) {
+        return Translate(0, 0, z);
+    }
 
-    TransformList &Append(const TransformList &other) {
-        transforms_.insert(transforms_.end(), other.transforms_.begin(),
-                           other.transforms_.end());
+    TransformList& Append(const TransformList& other) {
+        transforms_.insert(transforms_.end(), other.transforms_.begin(), other.transforms_.end());
         return *this;
     }
 
-    TransformList &AppendFront(const TransformList &other) {
-        transforms_.insert(transforms_.begin(), other.transforms_.begin(),
-                           other.transforms_.end());
+    TransformList& AppendFront(const TransformList& other) {
+        transforms_.insert(transforms_.begin(), other.transforms_.begin(), other.transforms_.end());
         return *this;
     }
 
@@ -175,4 +185,4 @@ private:
     std::vector<Transform> transforms_;
 };
 
-} // namespace scad
+}  // namespace scad

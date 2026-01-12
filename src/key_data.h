@@ -59,21 +59,20 @@ struct KeyData {
   }};
     // clang-format on
 
-    std::vector<Key *> thumb_keys() {
-        return {&key_delete, &key_backspace, &key_ctrl,
-                &key_alt,    &key_home,      &key_end};
+    std::vector<Key*> thumb_keys() {
+        return {&key_delete, &key_backspace, &key_ctrl, &key_alt, &key_home, &key_end};
     }
 
-    std::vector<Key *> all_keys() {
-        std::vector<Key *> keys;
-        for (Key *key : thumb_keys()) {
+    std::vector<Key*> all_keys() {
+        std::vector<Key*> keys;
+        for (Key* key : thumb_keys()) {
             keys.push_back(key);
         }
-        for (Key *key : grid.keys()) {
+        for (Key* key : grid.keys()) {
             keys.push_back(key);
         }
         return keys;
     }
 };
 
-} // namespace scad
+}  // namespace scad

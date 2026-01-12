@@ -18,7 +18,7 @@ struct CapSegment {
 };
 
 // Segments from bottom to top.
-Shape MakeCap(const std::vector<CapSegment> &segments) {
+Shape MakeCap(const std::vector<CapSegment>& segments) {
     std::vector<Shape> shapes;
     double height_so_far = 0;
     for (size_t i = 0; i < segments.size() - 1; ++i) {
@@ -39,27 +39,25 @@ Shape MakeCap(const std::vector<CapSegment> &segments) {
 // Expects the edge to be on the bottom.
 Shape RotateCapEdge(Shape s, SaEdgeType edge_type) {
     switch (edge_type) {
-    case SaEdgeType::LEFT:
-        return s.RotateZ(-90);
-    case SaEdgeType::RIGHT:
-        return s.RotateZ(90);
-    case SaEdgeType::TOP:
-        return s.RotateZ(180);
-    case SaEdgeType::BOTTOM:
-        return s;
-    default:
-        return s;
+        case SaEdgeType::LEFT:
+            return s.RotateZ(-90);
+        case SaEdgeType::RIGHT:
+            return s.RotateZ(90);
+        case SaEdgeType::TOP:
+            return s.RotateZ(180);
+        case SaEdgeType::BOTTOM:
+            return s;
+        default:
+            return s;
     }
 }
 
-} // namespace
+}  // namespace
 
 Shape MakeSwitch(bool add_side_nub) {
     std::vector<Shape> shapes;
-    Shape top_wall =
-        Cube(kSwitchWidth + kWallWidth * 2, kWallWidth, kSwitchThickness)
-            .Translate(0, kWallWidth / 2 + kSwitchWidth / 2,
-                       kSwitchThickness / 2);
+    Shape top_wall = Cube(kSwitchWidth + kWallWidth * 2, kWallWidth, kSwitchThickness)
+                         .Translate(0, kWallWidth / 2 + kSwitchWidth / 2, kSwitchThickness / 2);
 
     shapes.push_back(top_wall);
     shapes.push_back(top_wall.RotateZ(90));
@@ -67,12 +65,10 @@ Shape MakeSwitch(bool add_side_nub) {
     shapes.push_back(top_wall.RotateZ(270));
 
     if (add_side_nub) {
-        Shape side_nub = Hull(Cube(kWallWidth, 2.75, kSwitchThickness)
-                                  .Translate(kWallWidth / 2 + kSwitchWidth / 2,
-                                             0, kSwitchThickness / 2),
-                              Cylinder(2.75, 1, 30)
-                                  .RotateX(90)
-                                  .Translate(kSwitchWidth / 2, 0, 1));
+        Shape side_nub =
+            Hull(Cube(kWallWidth, 2.75, kSwitchThickness)
+                     .Translate(kWallWidth / 2 + kSwitchWidth / 2, 0, kSwitchThickness / 2),
+                 Cylinder(2.75, 1, 30).RotateX(90).Translate(kSwitchWidth / 2, 0, 1));
         shapes.push_back(side_nub);
         shapes.push_back(side_nub.RotateZ(180));
     }
@@ -113,10 +109,10 @@ Shape MakeSaEdgeCap(SaEdgeType edge_type) {
     Shape bar = Cube(kDsaTopSize, .01, .01);
     double half_top = kDsaTopSize * .5;
 
-    Shape bottom_edge =
-        Union(Hull(sa_cap, bar.TranslateY(-1 * half_top),
-                   bar.TranslateY(-1 * half_top).TranslateZ(edge_height),
-                   bar.TranslateY(half_top)));
+    Shape bottom_edge = Union(Hull(sa_cap,
+                                   bar.TranslateY(-1 * half_top),
+                                   bar.TranslateY(-1 * half_top).TranslateZ(edge_height),
+                                   bar.TranslateY(half_top)));
     return RotateCapEdge(bottom_edge, edge_type);
 }
 
@@ -127,26 +123,26 @@ Shape MakeSaTallEdgeCap(SaEdgeType edge_type) {
     Shape bar = Cube(kDsaTopSize, .01, .01);
     double half_top = kDsaTopSize * .5;
 
-    Shape bottom_edge =
-        Union(Hull(sa_cap, bar.TranslateY(-1 * half_top),
-                   bar.TranslateY(-1 * half_top).TranslateZ(edge_height),
-                   bar.TranslateY(half_top)));
+    Shape bottom_edge = Union(Hull(sa_cap,
+                                   bar.TranslateY(-1 * half_top),
+                                   bar.TranslateY(-1 * half_top).TranslateZ(edge_height),
+                                   bar.TranslateY(half_top)));
     return RotateCapEdge(bottom_edge, edge_type);
 }
 
-Key &Key::SetPosition(double x, double y, double z) {
+Key& Key::SetPosition(double x, double y, double z) {
     t().x = x;
     t().y = y;
     t().z = z;
     return *this;
 }
 
-Key &Key::SetParent(const Key &key) {
+Key& Key::SetParent(const Key& key) {
     parent_transforms = key.GetTransforms();
     return *this;
 }
 
-Key &Key::SetParent(const TransformList &transforms) {
+Key& Key::SetParent(const TransformList& transforms) {
     parent_transforms = transforms;
     return *this;
 }
@@ -159,8 +155,7 @@ TransformList Key::GetTransforms() const {
 }
 
 TransformList Key::GetSwitchTransforms() const {
-    double switch_z_offset =
-        type == KeyType::DSA ? kDsaSwitchZOffset : kSaSwitchZOffset;
+    double switch_z_offset = type == KeyType::DSA ? kDsaSwitchZOffset : kSaSwitchZOffset;
     if (disable_switch_z_offset) {
         switch_z_offset = 0;
     }
@@ -189,8 +184,7 @@ Shape Key::GetInverseCap(double custom_vertical_length) const {
 Shape Key::GetSwitch() const {
     std::vector<Shape> shapes;
     if (extra_z > 0) {
-        Shape s = Union(MakeSwitch(false),
-                        MakeSwitch(add_side_nub).TranslateZ(extra_z));
+        Shape s = Union(MakeSwitch(false), MakeSwitch(add_side_nub).TranslateZ(extra_z));
         if (extra_z > 4) {
             s += MakeSwitch(false).TranslateZ(4);
         }
@@ -205,11 +199,10 @@ Shape Key::GetSwitch() const {
                               GetTopLeft().Apply(GetPostConnector())));
     }
     if (extra_width_bottom > 0) {
-        shapes.push_back(
-            Hull(GetBottomLeft().Apply(GetPostConnector()),
-                 GetBottomLeftInternal().Apply(GetPostConnector()),
-                 GetBottomRightInternal().Apply(GetPostConnector()),
-                 GetBottomRight().Apply(GetPostConnector())));
+        shapes.push_back(Hull(GetBottomLeft().Apply(GetPostConnector()),
+                              GetBottomLeftInternal().Apply(GetPostConnector()),
+                              GetBottomRightInternal().Apply(GetPostConnector()),
+                              GetBottomRight().Apply(GetPostConnector())));
     }
     if (extra_width_left > 0) {
         shapes.push_back(Hull(GetBottomLeft().Apply(GetPostConnector()),
@@ -218,11 +211,10 @@ Shape Key::GetSwitch() const {
                               GetTopLeft().Apply(GetPostConnector())));
     }
     if (extra_width_right > 0) {
-        shapes.push_back(
-            Hull(GetBottomRight().Apply(GetPostConnector()),
-                 GetBottomRightInternal().Apply(GetPostConnector()),
-                 GetTopRightInternal().Apply(GetPostConnector()),
-                 GetTopRight().Apply(GetPostConnector())));
+        shapes.push_back(Hull(GetBottomRight().Apply(GetPostConnector()),
+                              GetBottomRightInternal().Apply(GetPostConnector()),
+                              GetTopRightInternal().Apply(GetPostConnector()),
+                              GetTopRight().Apply(GetPostConnector())));
     }
     return UnionAll(shapes);
 }
@@ -231,34 +223,32 @@ Shape Key::GetCap(bool fill_in_cap_path) const {
     Shape cap;
     double cap_height = 0;
     switch (type) {
-    case KeyType::DSA:
-        cap = MakeDsaCap();
-        cap_height = kDsaHeight;
-        break;
-    case KeyType::SA:
-        cap = MakeSaCap();
-        cap_height = kSaHeight;
-        break;
-    case KeyType::SA_EDGE:
-        cap = MakeSaEdgeCap(sa_edge_type);
-        cap_height = kSaHeight;
-        break;
-    case KeyType::SA_TALL_EDGE:
-        cap = MakeSaTallEdgeCap(sa_edge_type);
-        cap_height = kSaTallHeight;
-        break;
+        case KeyType::DSA:
+            cap = MakeDsaCap();
+            cap_height = kDsaHeight;
+            break;
+        case KeyType::SA:
+            cap = MakeSaCap();
+            cap_height = kSaHeight;
+            break;
+        case KeyType::SA_EDGE:
+            cap = MakeSaEdgeCap(sa_edge_type);
+            cap_height = kSaHeight;
+            break;
+        case KeyType::SA_TALL_EDGE:
+            cap = MakeSaTallEdgeCap(sa_edge_type);
+            cap_height = kSaTallHeight;
+            break;
     }
     if (fill_in_cap_path) {
-        Shape bottom =
-            cap.Projection().LinearExtrude(6).TranslateZ(-3 - cap_height);
+        Shape bottom = cap.Projection().LinearExtrude(6).TranslateZ(-3 - cap_height);
         cap = cap.Add(bottom);
     }
 
     if (disable_switch_z_offset) {
         // Need to move the cap up since the transforms are measured at the
         // switch top.
-        double switch_z_offset =
-            type == KeyType::DSA ? kDsaSwitchZOffset : kSaSwitchZOffset;
+        double switch_z_offset = type == KeyType::DSA ? kDsaSwitchZOffset : kSaSwitchZOffset;
         TransformList transforms;
         transforms.AddTransform().z = switch_z_offset;
         return transforms.Append(GetTransforms()).Apply(cap);
@@ -268,71 +258,66 @@ Shape Key::GetCap(bool fill_in_cap_path) const {
 
 TransformList Key::GetTopRight(double offset) const {
     TransformList transforms;
-    transforms.AddTransform(
-        {extra_width_right + offset, extra_width_top + offset, 0});
+    transforms.AddTransform({extra_width_right + offset, extra_width_top + offset, 0});
     return transforms.Append(GetTopRightInternal());
 }
 
 TransformList Key::GetTopRightInternal() const {
     TransformList transforms;
-    transforms.AddTransform(
-        {kSwitchHorizontalOffset, kSwitchHorizontalOffset, 0});
+    transforms.AddTransform({kSwitchHorizontalOffset, kSwitchHorizontalOffset, 0});
     return transforms.Append(GetSwitchTransforms());
 }
 
 TransformList Key::GetTopLeft(double offset) const {
     TransformList transforms;
-    transforms.AddTransform(
-        {-1 * (extra_width_left + offset), extra_width_top + offset, 0});
+    transforms.AddTransform({-1 * (extra_width_left + offset), extra_width_top + offset, 0});
     return transforms.Append(GetTopLeftInternal());
 }
 
 TransformList Key::GetTopLeftInternal() const {
     TransformList transforms;
-    transforms.AddTransform(
-        {-1 * kSwitchHorizontalOffset, kSwitchHorizontalOffset, 0});
+    transforms.AddTransform({-1 * kSwitchHorizontalOffset, kSwitchHorizontalOffset, 0});
     return transforms.Append(GetSwitchTransforms());
 }
 
 TransformList Key::GetBottomRight(double offset) const {
     TransformList transforms;
-    transforms.AddTransform(
-        {extra_width_right + offset, -1 * (extra_width_bottom + offset), 0});
+    transforms.AddTransform({extra_width_right + offset, -1 * (extra_width_bottom + offset), 0});
     return transforms.Append(GetBottomRightInternal());
 }
 
 TransformList Key::GetBottomRightInternal() const {
     TransformList transforms;
-    transforms.AddTransform(
-        {kSwitchHorizontalOffset, -1 * kSwitchHorizontalOffset, 0});
+    transforms.AddTransform({kSwitchHorizontalOffset, -1 * kSwitchHorizontalOffset, 0});
     return transforms.Append(GetSwitchTransforms());
 }
 
 TransformList Key::GetBottomLeft(double offset) const {
     TransformList transforms;
-    transforms.AddTransform({-1 * (extra_width_left + offset),
-                             -1 * (extra_width_bottom + offset), 0});
+    transforms.AddTransform(
+        {-1 * (extra_width_left + offset), -1 * (extra_width_bottom + offset), 0});
     return transforms.Append(GetBottomLeftInternal());
 }
 
 TransformList Key::GetBottomLeftInternal() const {
     TransformList transforms;
-    transforms.AddTransform(
-        {-1 * kSwitchHorizontalOffset, -1 * kSwitchHorizontalOffset, 0});
+    transforms.AddTransform({-1 * kSwitchHorizontalOffset, -1 * kSwitchHorizontalOffset, 0});
     return transforms.Append(GetSwitchTransforms());
 }
 
-TransformList Key::GetMiddle() const { return GetSwitchTransforms(); }
-
-std::vector<TransformList> Key::GetCorners(double offset) const {
-    return {GetTopLeft(offset), GetTopRight(offset), GetBottomRight(offset),
-            GetBottomLeft(offset)};
+TransformList Key::GetMiddle() const {
+    return GetSwitchTransforms();
 }
 
-Shape GetPostConnector() { return Cube(.01, .01, 3.5).TranslateZ(3.5 / -2.0); }
+std::vector<TransformList> Key::GetCorners(double offset) const {
+    return {GetTopLeft(offset), GetTopRight(offset), GetBottomRight(offset), GetBottomLeft(offset)};
+}
 
-Shape ConnectVertical(const Key &top, const Key &bottom, Shape connector,
-                      double offset) {
+Shape GetPostConnector() {
+    return Cube(.01, .01, 3.5).TranslateZ(3.5 / -2.0);
+}
+
+Shape ConnectVertical(const Key& top, const Key& bottom, Shape connector, double offset) {
     return Union(Hull(top.GetBottomRight(offset).Apply(connector),
                       top.GetBottomLeft(offset).Apply(connector),
                       bottom.GetTopLeft(offset).Apply(connector)),
@@ -341,8 +326,7 @@ Shape ConnectVertical(const Key &top, const Key &bottom, Shape connector,
                       top.GetBottomRight(offset).Apply(connector)));
 }
 
-Shape ConnectHorizontal(const Key &left, const Key &right, Shape connector,
-                        double offset) {
+Shape ConnectHorizontal(const Key& left, const Key& right, Shape connector, double offset) {
     return Union(Hull(left.GetTopRight(offset).Apply(connector),
                       left.GetBottomRight(offset).Apply(connector),
                       right.GetBottomLeft(offset).Apply(connector)),
@@ -351,9 +335,12 @@ Shape ConnectHorizontal(const Key &left, const Key &right, Shape connector,
                       left.GetTopRight(offset).Apply(connector)));
 }
 
-Shape ConnectDiagonal(const Key &top_left, const Key &top_right,
-                      const Key &bottom_right, const Key &bottom_left,
-                      Shape connector, double offset) {
+Shape ConnectDiagonal(const Key& top_left,
+                      const Key& top_right,
+                      const Key& bottom_right,
+                      const Key& bottom_left,
+                      Shape connector,
+                      double offset) {
     return Union(Hull(top_left.GetBottomRight(offset).Apply(connector),
                       top_right.GetBottomLeft(offset).Apply(connector),
                       bottom_right.GetTopLeft(offset).Apply(connector)),
@@ -362,36 +349,40 @@ Shape ConnectDiagonal(const Key &top_left, const Key &top_right,
                       top_left.GetBottomRight(offset).Apply(connector)));
 }
 
-Shape Tri(const TransformList &t1, const TransformList &t2,
-          const TransformList &t3, Shape connector) {
+Shape Tri(const TransformList& t1,
+          const TransformList& t2,
+          const TransformList& t3,
+          Shape connector) {
     return Tri(t1.Apply(connector), t2.Apply(connector), t3.Apply(connector));
 }
 
-Shape Tri(const Shape &s1, const Shape &s2, const Shape &s3) {
+Shape Tri(const Shape& s1, const Shape& s2, const Shape& s3) {
     return Hull(s1, s2, s3);
 }
 
-Shape TriHull(const TransformList &t1, const TransformList &t2,
-              const TransformList &t3, const TransformList &t4,
+Shape TriHull(const TransformList& t1,
+              const TransformList& t2,
+              const TransformList& t3,
+              const TransformList& t4,
               Shape connector) {
     return TriMesh({t1, t2, t3, t4}, connector);
 }
 
-Shape TriHull(const Shape &s1, const Shape &s2, const Shape &s3,
-              const Shape &s4) {
+Shape TriHull(const Shape& s1, const Shape& s2, const Shape& s3, const Shape& s4) {
     return TriMesh({s1, s2, s3, s4});
 }
 
-Shape TriFan(const TransformList &center,
-             const std::vector<TransformList> &transforms, Shape connector) {
+Shape TriFan(const TransformList& center,
+             const std::vector<TransformList>& transforms,
+             Shape connector) {
     std::vector<Shape> shapes;
-    for (auto &t : transforms) {
+    for (auto& t : transforms) {
         shapes.push_back(t.Apply(connector));
     }
     return TriFan(center.Apply(connector), shapes);
 }
 
-Shape TriFan(Shape center, const std::vector<Shape> &shapes) {
+Shape TriFan(Shape center, const std::vector<Shape>& shapes) {
     std::vector<Shape> result;
     for (size_t i = 0; i < shapes.size() - 1; ++i) {
         result.push_back(Hull(center, shapes[i], shapes[i + 1]));
@@ -399,15 +390,15 @@ Shape TriFan(Shape center, const std::vector<Shape> &shapes) {
     return UnionAll(result);
 }
 
-Shape TriMesh(const std::vector<TransformList> &transforms, Shape connector) {
+Shape TriMesh(const std::vector<TransformList>& transforms, Shape connector) {
     std::vector<Shape> shapes;
-    for (auto &t : transforms) {
+    for (auto& t : transforms) {
         shapes.push_back(t.Apply(connector));
     }
     return TriMesh(shapes);
 }
 
-Shape TriMesh(const std::vector<Shape> &shapes) {
+Shape TriMesh(const std::vector<Shape>& shapes) {
     std::vector<Shape> result;
     for (size_t i = 0; i < shapes.size() - 2; ++i) {
         result.push_back(Hull(shapes[i], shapes[i + 1], shapes[i + 2]));
@@ -415,4 +406,4 @@ Shape TriMesh(const std::vector<Shape> &shapes) {
     return UnionAll(result);
 }
 
-} // namespace scad
+}  // namespace scad
