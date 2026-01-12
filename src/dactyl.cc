@@ -26,7 +26,16 @@ void AddShapes(std::vector<Shape>* shapes, std::vector<Shape> to_add) {
 Shape ConnectMainKeys(KeyData& d);
 
 int main() {
-    printf("generating..\n");
+    // Create "output" directory
+    try {
+        std::filesystem::create_directories("output/scad");
+    } catch (const std::filesystem::filesystem_error& e) {
+        std::cerr << "Error creating 'output' directory: " << e.what() << std::endl;
+        return 1;
+    }
+
+    std::cout << "Generating..." << std::endl;
+
     TransformList key_origin;
     key_origin.Translate(-20, -40, 3);
 
@@ -412,19 +421,12 @@ int main() {
     // Subtracting is expensive to preview and is best to disable while testing.
     result = result.Subtract(UnionAll(negative_shapes));
 
-    // Create "output" directory
-    try {
-        std::filesystem::create_directories("output");
-    } catch (const std::filesystem::filesystem_error& e) {
-        std::cerr << "Error creating 'output' directory: " << e.what() << std::endl;
-        return 1;
-    }
-
-    result.WriteToFile("output/left.scad");
-    result.MirrorX().WriteToFile("output/right.scad");
+    result.WriteToFile("output/scad/left.scad");
+    result.MirrorX().WriteToFile("output/scad/right.scad");
 
     // Bottom plate
     {
+        std::cout << "Generating bottom plates..." << std::endl;
         std::vector<Shape> bottom_plate_shapes = {result};
         for (Key* key : d.all_keys()) {
             bottom_plate_shapes.push_back(Hull(key->GetSwitch()));
@@ -434,9 +436,11 @@ int main() {
                                  .Projection()
                                  .LinearExtrude(1.5)
                                  .Subtract(UnionAll(screw_holes));
-        bottom_plate.WriteToFile("output/bottom_left.scad");
-        bottom_plate.MirrorX().WriteToFile("output/bottom_right.scad");
+        bottom_plate.WriteToFile("output/scad/bottom_left.scad");
+        bottom_plate.MirrorX().WriteToFile("output/scad/bottom_right.scad");
     }
+
+    std::cout << "Done." << std::endl;
 
     return 0;
 }
