@@ -1,4 +1,6 @@
+#include <filesystem>
 #include <glm/glm.hpp>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -409,8 +411,17 @@ int main() {
     Shape result = UnionAll(shapes);
     // Subtracting is expensive to preview and is best to disable while testing.
     result = result.Subtract(UnionAll(negative_shapes));
-    result.WriteToFile("left.scad");
-    result.MirrorX().WriteToFile("right.scad");
+
+    // Create "output" directory
+    try {
+        std::filesystem::create_directories("output");
+    } catch (const std::filesystem::filesystem_error& e) {
+        std::cerr << "Error creating 'output' directory: " << e.what() << std::endl;
+        return 1;
+    }
+
+    result.WriteToFile("output/left.scad");
+    result.MirrorX().WriteToFile("output/right.scad");
 
     // Bottom plate
     {
@@ -423,8 +434,8 @@ int main() {
                                  .Projection()
                                  .LinearExtrude(1.5)
                                  .Subtract(UnionAll(screw_holes));
-        bottom_plate.WriteToFile("bottom_left.scad");
-        bottom_plate.MirrorX().WriteToFile("bottom_right.scad");
+        bottom_plate.WriteToFile("output/bottom_left.scad");
+        bottom_plate.MirrorX().WriteToFile("output/bottom_right.scad");
     }
 
     return 0;
