@@ -65,13 +65,23 @@ Shape MakeSwitch(bool add_side_nub) {
     shapes.push_back(top_wall.RotateZ(270));
 
     if (add_side_nub) {
-        Shape side_nub =
-            Hull(Cube(kWallWidth, 2.75, kSwitchThickness)
-                     .Translate(kWallWidth / 2 + kSwitchWidth / 2, 0, kSwitchThickness / 2),
-                 Cylinder(2.75, 1, 30).RotateX(90).Translate(kSwitchWidth / 2, 0, 1));
+        Shape side_nub = Cube(0.6, 2.75, 1)
+                             .Translate(kWallWidth / 2 + kSwitchWidth / 2 - 1.2,
+                                        0,
+                                        kSwitchThickness - kSwitchThickness / 8);
         shapes.push_back(side_nub);
         shapes.push_back(side_nub.RotateZ(180));
     }
+
+    Shape boardHook1 =
+        Cube(1, kWallWidth, 0.9).Translate(kWallWidth / 2 + kSwitchWidth / 2 - 1, 0, -0.45);
+    shapes.push_back(boardHook1.TranslateY(-3));
+    shapes.push_back(boardHook1.RotateZ(180).TranslateY(-3));
+
+    Shape boardHook2 =
+        Cube(1.25, kWallWidth, 0.3).Translate(kWallWidth / 2 + kSwitchWidth / 2 - 1.125, 0, -0.9);
+    shapes.push_back(boardHook2.TranslateY(-3));
+    shapes.push_back(boardHook2.RotateZ(180).TranslateY(-3));
 
     return UnionAll(shapes).TranslateZ(kSwitchThickness * -1);
 }

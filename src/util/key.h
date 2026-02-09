@@ -11,7 +11,7 @@ namespace scad {
 
 // All sizes in mm.
 const double kSwitchWidth = 14.4;
-const double kSwitchThickness = 4;
+const double kSwitchThickness = 5;
 const double kWallWidth = 2;
 
 const double kDsaHeight = 8;

@@ -72,10 +72,10 @@ KeyData::KeyData(TransformList key_origin) {
     key_backspace.Configure([&](Key& k) {
         k.name = "key_backspace";
         k.SetParent(key_origin);
-        k.SetPosition(60, -9.18, 42.83);
-        k.t().rz = -21;
-        k.t().rx = 12;
-        k.t().ry = -4.5;
+        k.SetPosition(64.5, -9.18, 42.83);
+        k.t().rz = -25;
+        k.t().rx = 15;
+        k.t().ry = 15;
     });
 
     // Second thumb key.
