@@ -75,6 +75,7 @@ public:
     double extra_z = 0;
 
     bool add_side_nub = true;
+    bool add_board_hook = true;
     bool disable_switch_z_offset = false;
 
     KeyType type = KeyType::DSA;
@@ -228,6 +229,9 @@ Shape MakeDsaCap();
 Shape MakeSaCap();
 Shape MakeSaEdgeCap(SaEdgeType edge_type = SaEdgeType::BOTTOM);
 Shape MakeSaTallEdgeCap(SaEdgeType edge_type = SaEdgeType::BOTTOM);
-Shape MakeSwitch(bool add_side_nub = true);
+Shape MakeSwitch(bool add_side_nub = true,
+                 bool add_board_hook = true,
+                 bool add_top_board_hook = false,
+                 bool add_bottom_board_hook = false);
 
 }  // namespace scad

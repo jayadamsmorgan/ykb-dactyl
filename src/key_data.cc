@@ -70,6 +70,7 @@ KeyData::KeyData(TransformList key_origin) {
     //
 
     key_backspace.Configure([&](Key& k) {
+        k.add_board_hook = false;
         k.name = "key_backspace";
         k.SetParent(key_origin);
         k.SetPosition(64.5, -9.18, 42.83);
@@ -80,6 +81,7 @@ KeyData::KeyData(TransformList key_origin) {
 
     // Second thumb key.
     key_delete.Configure([&](Key& k) {
+        k.add_board_hook = false;
         k.name = "key_delete";
         k.SetParent(key_backspace);
         k.SetPosition(kDefaultKeySpacing, 0, 0);
@@ -87,6 +89,7 @@ KeyData::KeyData(TransformList key_origin) {
 
     // Bottom side key.
     key_end.Configure([&](Key& k) {
+        k.add_board_hook = false;
         k.name = "key_end";
         k.SetParent(key_delete);
         k.SetPosition(kDefaultKeySpacing, -9, 0);
@@ -94,6 +97,7 @@ KeyData::KeyData(TransformList key_origin) {
 
     // Middle side key.
     key_home.Configure([&](Key& k) {
+        k.add_board_hook = false;
         k.name = "key_home";
         k.SetParent(key_delete);
         k.SetPosition(kDefaultKeySpacing, 10, 0);
@@ -101,6 +105,7 @@ KeyData::KeyData(TransformList key_origin) {
 
     // Top side key;
     key_alt.Configure([&](Key& k) {
+        k.add_board_hook = false;
         k.name = "key_alt";
         k.SetParent(key_delete);
         k.SetPosition(kDefaultKeySpacing, 10 + kDefaultKeySpacing, 0);
@@ -108,6 +113,7 @@ KeyData::KeyData(TransformList key_origin) {
 
     // Top left key.
     key_ctrl.Configure([&](Key& k) {
+        k.add_board_hook = false;
         k.name = "key_ctrl";
         k.SetParent(key_delete);
         k.SetPosition(0, 10 + kDefaultKeySpacing, 0);

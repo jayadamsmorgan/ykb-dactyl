@@ -19,6 +19,8 @@ bool generateTestKeys = false;
 // Add the caps into the stl for testing.
 bool addCaps = false;
 
+bool test = false;
+
 enum class Direction { UP, DOWN, LEFT, RIGHT };
 
 void AddShapes(std::vector<Shape>* shapes, std::vector<Shape> to_add) {
@@ -432,19 +434,49 @@ int main(int argc, char* argv[]) {
     std::vector<Shape> negative_shapes;
     AddShapes(&negative_shapes, screw_holes);
     // Cut off the parts sticking up into the thumb plate.
-    negative_shapes.push_back(
-        d.key_backspace.GetTopLeft().Apply(Cube(50, 50, 6).TranslateZ(3)).Color("red"));
+    // negative_shapes.push_back(
+    //     d.key_backspace.GetTopLeft().Apply(Cube(50, 50, 6).TranslateZ(3)).Color("red"));
 
-    // Cut out hole for holder.
-    Shape holder_hole = Cube(29.0, 20.0, 12.5).TranslateZ(12.0 / 2);
-    glm::vec3 holder_location = d.key_4.GetTopLeft().Apply(kOrigin);
-    holder_location.z = -0.5;
-    holder_location.x += 17.5;
-    negative_shapes.push_back(holder_hole.Translate(holder_location));
+    // Cut out hole for type-c
+    Shape cylinderHole = Cylinder(20, 1.5, 15).RotateX(90);
+    Shape type_c_hole =
+        Hull(Cube(5.5, 20, 3), cylinderHole.TranslateX(-2.75), cylinderHole.TranslateX(2.75))
+            .RotateZ(-9)
+            .TranslateX(2.7);
+    glm::vec3 type_c_location = d.key_4.GetTopLeft().Apply(kOrigin);
+    type_c_location.z = 6.5;
+    type_c_location.x += 25;
+    negative_shapes.push_back(type_c_hole.Translate(type_c_location));
+
+    Shape buttonHole = Union(Cylinder(10, 2.5, 15), Cube(2, 10, 5))
+                           .RotateY(90)
+                           .Translate(type_c_location)
+                           .TranslateX(15)
+                           .TranslateY(-5);
+    Shape button = Union(Cylinder(10, 2.3, 15), Cube(1.8, 9.8, 4.8))
+                       .RotateY(90)
+                       .Translate(type_c_location)
+                       .TranslateX(15)
+                       .TranslateY(-5);
+    negative_shapes.push_back(buttonHole.Subtract(button));
 
     Shape result = UnionAll(shapes);
     // Subtracting is expensive to preview and is best to disable while testing.
     result = result.Subtract(UnionAll(negative_shapes));
+
+    std::vector<Shape> bottom_plate_shapes = {result};
+    for (Key* key : d.all_keys()) {
+        bottom_plate_shapes.push_back(Hull(key->GetSwitch()));
+    }
+
+    Shape bottom_plate = UnionAll(bottom_plate_shapes)
+                             .Projection()
+                             .LinearExtrude(1.5)
+                             .Subtract(UnionAll(screw_holes));
+
+    if (test) {
+        result = Union(result.Color("black"), bottom_plate.TranslateZ(-40).Color("black"));
+    }
 
     result.WriteToFile("output/scad/left.scad");
     result.MirrorX().WriteToFile("output/scad/right.scad");
@@ -454,20 +486,10 @@ int main(int argc, char* argv[]) {
     // Bottom plate
     {
         std::cout << "Generating bottom plates..." << std::endl;
-        std::vector<Shape> bottom_plate_shapes = {result};
-        for (Key* key : d.all_keys()) {
-            bottom_plate_shapes.push_back(Hull(key->GetSwitch()));
-        }
-
-        Shape bottom_plate = UnionAll(bottom_plate_shapes)
-                                 .Projection()
-                                 .LinearExtrude(1.5)
-                                 .Subtract(UnionAll(screw_holes));
         bottom_plate.WriteToFile("output/scad/bottom_left.scad");
         bottom_plate.MirrorX().WriteToFile("output/scad/bottom_right.scad");
+        std::cout << "Done." << std::endl;
     }
-
-    std::cout << "Done." << std::endl;
 
     return 0;
 }
