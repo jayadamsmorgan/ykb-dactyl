@@ -403,11 +403,6 @@ int main(int argc, char* argv[]) {
         screw_left_top.x += 2.8;
         screw_left_top.y += -.5;
 
-        glm::vec3 screw_right_top = d.key_5.GetTopRight().Apply(kOrigin);
-        screw_right_top.z = 0;
-        screw_right_top.x += 4;
-        screw_right_top.y += -15.5;
-
         glm::vec3 screw_right_bottom = d.key_end.GetBottomLeft().Apply(kOrigin);
         screw_right_bottom.z = 0;
         screw_right_bottom.y += 3.5;
@@ -418,13 +413,11 @@ int main(int argc, char* argv[]) {
         screw_right_mid.y += -.9;
 
         shapes.push_back(Union(screw_insert.Translate(screw_left_top),
-                               screw_insert.Translate(screw_right_top),
                                screw_insert.Translate(screw_right_mid),
                                screw_insert.Translate(screw_right_bottom),
                                screw_insert.Translate(screw_left_bottom)));
         screw_holes = {
             screw_hole.Translate(screw_left_top),
-            screw_hole.Translate(screw_right_top),
             screw_hole.Translate(screw_right_mid),
             screw_hole.Translate(screw_right_bottom),
             screw_hole.Translate(screw_left_bottom),
@@ -473,6 +466,13 @@ int main(int argc, char* argv[]) {
                              .Projection()
                              .LinearExtrude(1.5)
                              .Subtract(UnionAll(screw_holes));
+
+    Shape pcb = bottom_plate.Projection(true).OffsetDelta(-4.5).LinearExtrude(1.2);
+    pcb = pcb.Subtract(Cube(200, 200, 2).TranslateX(-90));
+    pcb = pcb.Subtract(Cube(200, 200, 2).TranslateY(-102));
+
+    // result = Union(result, pcb.TranslateZ(-20));
+    pcb.WriteToFile("output/scad/pcbtest.scad");
 
     if (test) {
         result = Union(result.Color("black"), bottom_plate.TranslateZ(-40).Color("black"));
