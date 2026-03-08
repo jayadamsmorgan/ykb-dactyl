@@ -70,10 +70,11 @@ KeyData::KeyData(TransformList key_origin) {
     //
 
     key_backspace.Configure([&](Key& k) {
-        k.add_board_hook = false;
+        k.add_left_board_hook = false;
+        k.add_bottom_board_hook = true;
         k.name = "key_backspace";
         k.SetParent(key_origin);
-        k.SetPosition(64.5, -9.18, 42.83);
+        k.SetPosition(60, -9.18, 42.83);
         k.t().rz = -25;
         k.t().rx = 15;
         k.t().ry = 15;
@@ -81,7 +82,9 @@ KeyData::KeyData(TransformList key_origin) {
 
     // Second thumb key.
     key_delete.Configure([&](Key& k) {
-        k.add_board_hook = false;
+        k.add_left_board_hook = false;
+        k.add_right_board_hook = false;
+        k.add_bottom_board_hook = true;
         k.name = "key_delete";
         k.SetParent(key_backspace);
         k.SetPosition(kDefaultKeySpacing, 0, 0);
@@ -89,7 +92,8 @@ KeyData::KeyData(TransformList key_origin) {
 
     // Bottom side key.
     key_end.Configure([&](Key& k) {
-        k.add_board_hook = false;
+        k.add_right_board_hook = false;
+        k.add_bottom_board_hook = true;
         k.name = "key_end";
         k.SetParent(key_delete);
         k.SetPosition(kDefaultKeySpacing, -9, 0);
@@ -97,7 +101,7 @@ KeyData::KeyData(TransformList key_origin) {
 
     // Middle side key.
     key_home.Configure([&](Key& k) {
-        k.add_board_hook = false;
+        k.add_right_board_hook = false;
         k.name = "key_home";
         k.SetParent(key_delete);
         k.SetPosition(kDefaultKeySpacing, 10, 0);
@@ -105,7 +109,8 @@ KeyData::KeyData(TransformList key_origin) {
 
     // Top side key;
     key_alt.Configure([&](Key& k) {
-        k.add_board_hook = false;
+        k.add_right_board_hook = false;
+        k.add_top_board_hook = true;
         k.name = "key_alt";
         k.SetParent(key_delete);
         k.SetPosition(kDefaultKeySpacing, 10 + kDefaultKeySpacing, 0);
@@ -113,7 +118,8 @@ KeyData::KeyData(TransformList key_origin) {
 
     // Top left key.
     key_ctrl.Configure([&](Key& k) {
-        k.add_board_hook = false;
+        k.add_top_board_hook = true;
+        k.add_left_board_hook = false;
         k.name = "key_ctrl";
         k.SetParent(key_delete);
         k.SetPosition(0, 10 + kDefaultKeySpacing, 0);
@@ -202,20 +208,16 @@ KeyData::KeyData(TransformList key_origin) {
     // angled due to the larger radius.
     key_3 = GetRotatedKey(kDColumnRadius + 15, true);
     key_3.Configure([&](Key& k) {
+        k.add_top_board_hook = true;
         k.name = "3";
         k.SetParent(key_e);
     });
 
     key_c = GetRotatedKey(kDColumnRadius, false);
     key_c.Configure([&](Key& k) {
+        k.add_bottom_board_hook = true;
         k.name = "c";
         k.SetParent(key_d);
-    });
-
-    key_left_arrow = GetRotatedKey(kDColumnRadius, false);
-    key_left_arrow.Configure([&](Key& k) {
-        k.name = "left_arrow";
-        k.SetParent(key_c);
     });
 
     // S column
@@ -227,20 +229,16 @@ KeyData::KeyData(TransformList key_origin) {
 
     key_2 = GetRotatedKey(kSColumnRadius, true);
     key_2.Configure([&](Key& k) {
+        k.add_top_board_hook = true;
         k.name = "2";
         k.SetParent(key_w);
     });
 
     key_x = GetRotatedKey(kSColumnRadius, false);
     key_x.Configure([&](Key& k) {
+        k.add_bottom_board_hook = true;
         k.name = "x";
         k.SetParent(key_s);
-    });
-
-    key_slash = GetRotatedKey(kSColumnRadius, false);
-    key_slash.Configure([&](Key& k) {
-        k.name = "slash";
-        k.SetParent(key_x);
     });
 
     // F column
@@ -252,20 +250,16 @@ KeyData::KeyData(TransformList key_origin) {
 
     key_4 = GetRotatedKey(kFColumnRadius, true);
     key_4.Configure([&](Key& k) {
+        k.add_top_board_hook = true;
         k.name = "4";
         k.SetParent(key_r);
     });
 
     key_v = GetRotatedKey(kFColumnRadius, false);
     key_v.Configure([&](Key& k) {
+        k.add_bottom_board_hook = true;
         k.name = "v";
         k.SetParent(key_f);
-    });
-
-    key_right_arrow = GetRotatedKey(kFColumnRadius, false);
-    key_right_arrow.Configure([&](Key& k) {
-        k.name = "right_arrow";
-        k.SetParent(key_v);
     });
 
     key_t = GetRotatedKey(kGColumnRadius, true);
@@ -276,12 +270,14 @@ KeyData::KeyData(TransformList key_origin) {
 
     key_5 = GetRotatedKey(kGColumnRadius, true);
     key_5.Configure([&](Key& k) {
+        k.add_top_board_hook = true;
         k.name = "5";
         k.SetParent(key_t);
     });
 
     key_b = GetRotatedKey(kGColumnRadius, false);
     key_b.Configure([&](Key& k) {
+        k.add_bottom_board_hook = true;
         k.name = "b";
         k.SetParent(key_g);
     });
@@ -295,20 +291,16 @@ KeyData::KeyData(TransformList key_origin) {
 
     key_1 = GetRotatedKey(kAColumnRadius, true);
     key_1.Configure([&](Key& k) {
+        k.add_top_board_hook = true;
         k.name = "1";
         k.SetParent(key_q);
     });
 
     key_z = GetRotatedKey(kAColumnRadius, false);
     key_z.Configure([&](Key& k) {
+        k.add_bottom_board_hook = true;
         k.name = "z";
         k.SetParent(key_a);
-    });
-
-    key_tilde = GetRotatedKey(kAColumnRadius, false);
-    key_tilde.Configure([&](Key& k) {
-        k.name = "tilde";
-        k.SetParent(key_z);
     });
 
     // Caps column
@@ -320,12 +312,14 @@ KeyData::KeyData(TransformList key_origin) {
 
     key_plus = GetRotatedKey(kCapsColumnRadius, true);
     key_plus.Configure([&](Key& k) {
+        k.add_top_board_hook = true;
         k.name = "plus";
         k.SetParent(key_tab);
     });
 
     key_shift = GetRotatedKey(kCapsColumnRadius, false);
     key_shift.Configure([&](Key& k) {
+        k.add_bottom_board_hook = true;
         k.name = "shift";
         k.SetParent(key_caps);
     });

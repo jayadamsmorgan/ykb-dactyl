@@ -19,8 +19,6 @@ bool generateTestKeys = false;
 // Add the caps into the stl for testing.
 bool addCaps = false;
 
-bool test = false;
-
 enum class Direction { UP, DOWN, LEFT, RIGHT };
 
 void AddShapes(std::vector<Shape>* shapes, std::vector<Shape> to_add) {
@@ -72,7 +70,7 @@ int main(int argc, char* argv[]) {
         std::vector<Shape> test_shapes;
         std::vector<Key*> test_keys = {&d.key_3, &d.key_e, &d.key_4, &d.key_5, &d.key_d};
         for (Key* key : test_keys) {
-            key->add_side_nub = false;
+            key->add_side_nubs = false;
             key->extra_z = 4;
             test_shapes.push_back(key->GetSwitch());
             if (addCaps) {
@@ -148,27 +146,27 @@ int main(int argc, char* argv[]) {
 
     // These transforms with TranslateFront are moving the connectors down in
     // the z direction to reduce the vertical jumps.
-    TransformList slash_bottom_right = d.key_slash.GetBottomRight().TranslateFront(0, -5, -3);
+    TransformList v_bottom_right = d.key_z.GetBottomLeft().TranslateFront(0, -2, -3);
 
-    shapes.push_back(TriFan(slash_bottom_right,
-                            {
-                                d.key_left_arrow.GetBottomRight().TranslateFront(0, 0, -1),
-                                d.key_left_arrow.GetBottomLeft(),
-                                d.key_slash.GetBottomRight().TranslateFront(0, 0, -1),
-                            }));
-    shapes.push_back(TriFan(d.key_backspace.GetBottomLeft(),
-                            {
-                                slash_bottom_right,
-                                d.key_left_arrow.GetBottomRight().TranslateFront(0, 0, -1),
-                                d.key_right_arrow.GetBottomLeft().TranslateFront(0, 0, -1),
-                                d.key_right_arrow.GetBottomRight(),
-                            }));
-    shapes.push_back(TriFan(d.key_tilde.GetBottomRight(),
-                            {
-                                d.key_slash.GetBottomLeft(),
-                                d.key_slash.GetBottomRight().TranslateFront(0, 0, -1),
-                                slash_bottom_right,
-                            }));
+    // shapes.push_back(TriFan(v_bottom_right,
+    //                         {
+    //                             d.key_x.GetBottomRight().TranslateFront(0, 0, -1),
+    //                             d.key_x.GetBottomLeft(),
+    //                             d.key_z.GetBottomRight().TranslateFront(0, 0, -1),
+    //                         }));
+    // shapes.push_back(TriFan(d.key_backspace.GetBottomLeft(),
+    //                         {
+    //                             v_bottom_right,
+    //                             d.key_left_arrow.GetBottomRight().TranslateFront(0, 0, -1),
+    //                             d.key_right_arrow.GetBottomLeft().TranslateFront(0, 0, -1),
+    //                             d.key_right_arrow.GetBottomRight(),
+    //                         }));
+    // shapes.push_back(TriFan(d.key_tilde.GetBottomRight(),
+    //                         {
+    //                             d.key_slash.GetBottomLeft(),
+    //                             d.key_slash.GetBottomRight().TranslateFront(0, 0, -1),
+    //                             v_bottom_right,
+    //                         }));
     shapes.push_back(TriFan(d.key_delete.GetTopLeft(),
                             {
                                 d.key_ctrl.GetTopLeft(),
@@ -180,8 +178,8 @@ int main(int argc, char* argv[]) {
                                 d.key_b.GetBottomRight(),
                                 d.key_backspace.GetTopLeft(),
                                 d.key_backspace.GetTopLeft(),
-                                d.key_right_arrow.GetBottomRight(),
-                                d.key_right_arrow.GetTopRight(),
+                                d.key_v.GetBottomRight(),
+                                d.key_v.GetTopRight(),
                                 d.key_v.GetBottomRight(),
                             }));
 
@@ -189,9 +187,42 @@ int main(int argc, char* argv[]) {
     shapes.push_back(TriFan(d.key_shift.GetBottomRight(),
                             {
                                 d.key_z.GetBottomLeft(),
-                                d.key_tilde.GetTopLeft(),
-                                d.key_tilde.GetBottomLeft(),
+                                v_bottom_right,
                                 d.key_shift.GetBottomLeft(),
+                            }));
+
+    shapes.push_back(TriFan(d.key_z.GetBottomRight().TranslateFront(0, 0, -2),
+                            {
+                                d.key_backspace.GetBottomLeft(),
+                                v_bottom_right,
+                                d.key_z.GetBottomLeft(),
+                            }));
+    shapes.push_back(TriFan(d.key_z.GetBottomRight().TranslateFront(0, 0, -2),
+                            {
+                                d.key_x.GetBottomLeft(),
+                                d.key_backspace.GetBottomLeft(),
+                            }));
+    shapes.push_back(TriFan(d.key_x.GetBottomLeft(),
+                            {
+                                d.key_x.GetBottomRight(),
+                                d.key_c.GetBottomLeft(),
+                                d.key_backspace.GetBottomLeft(),
+                            }));
+    shapes.push_back(TriFan(d.key_c.GetBottomLeft(),
+                            {
+                                d.key_c.GetBottomRight(),
+                                d.key_backspace.GetBottomLeft(),
+                            }));
+    shapes.push_back(TriFan(d.key_c.GetBottomRight(),
+                            {
+                                d.key_v.GetBottomLeft(),
+                                d.key_v.GetBottomRight(),
+                                d.key_backspace.GetBottomLeft(),
+                            }));
+    shapes.push_back(TriFan(d.key_v.GetBottomRight(),
+                            {
+                                d.key_backspace.GetTopLeft(),
+                                d.key_backspace.GetBottomLeft(),
                             }));
 
     // Connecting top wall to keys
@@ -306,10 +337,10 @@ int main(int argc, char* argv[]) {
 
             {d.key_backspace.GetBottomLeft(), down},
 
-            {slash_bottom_right, down},
+            {v_bottom_right, down},
 
-            {d.key_tilde.GetBottomRight(), down},
-            {d.key_tilde.GetBottomLeft(), down},
+            // {d.key_tilde.GetBottomRight(), down},
+            // {d.key_tilde.GetBottomLeft(), down},
 
             {d.key_shift.GetBottomLeft(), down, 0, .75},
             {d.key_shift.GetBottomLeft(), left, 0, .5},
@@ -431,7 +462,7 @@ int main(int argc, char* argv[]) {
     //     d.key_backspace.GetTopLeft().Apply(Cube(50, 50, 6).TranslateZ(3)).Color("red"));
 
     // Cut out hole for type-c
-    Shape cylinderHole = Cylinder(20, 1.5, 15).RotateX(90);
+    Shape cylinderHole = Cylinder(20, 1.5, 30).RotateX(90);
     Shape type_c_hole =
         Hull(Cube(5.5, 20, 3), cylinderHole.TranslateX(-2.75), cylinderHole.TranslateX(2.75))
             .RotateZ(-9)
@@ -441,17 +472,19 @@ int main(int argc, char* argv[]) {
     type_c_location.x += 25;
     negative_shapes.push_back(type_c_hole.Translate(type_c_location));
 
-    Shape buttonHole = Union(Cylinder(10, 2.5, 15), Cube(2, 10, 5))
+    Shape buttonHole = Union(Cylinder(10, 2.5, 30), Cube(2, 10, 5))
                            .RotateY(90)
+                           .RotateZ(12)
                            .Translate(type_c_location)
                            .TranslateX(15)
                            .TranslateY(-5);
-    Shape button = Union(Cylinder(10, 2.3, 15), Cube(1.8, 9.8, 4.8))
+    Shape button = Union(Cylinder(10, 2.3, 30), Cube(1.8, 9.8, 4.8))
                        .RotateY(90)
+                       .RotateZ(12)
                        .Translate(type_c_location)
                        .TranslateX(15)
                        .TranslateY(-5);
-    negative_shapes.push_back(buttonHole.Subtract(button));
+    negative_shapes.push_back(buttonHole);
 
     Shape result = UnionAll(shapes);
     // Subtracting is expensive to preview and is best to disable while testing.
@@ -466,17 +499,6 @@ int main(int argc, char* argv[]) {
                              .Projection()
                              .LinearExtrude(1.5)
                              .Subtract(UnionAll(screw_holes));
-
-    Shape pcb = bottom_plate.Projection(true).OffsetDelta(-4.5).LinearExtrude(1.2);
-    pcb = pcb.Subtract(Cube(200, 200, 2).TranslateX(-90));
-    pcb = pcb.Subtract(Cube(200, 200, 2).TranslateY(-102));
-
-    // result = Union(result, pcb.TranslateZ(-20));
-    pcb.WriteToFile("output/scad/pcbtest.scad");
-
-    if (test) {
-        result = Union(result.Color("black"), bottom_plate.TranslateZ(-40).Color("black"));
-    }
 
     result.WriteToFile("output/scad/left.scad");
     result.MirrorX().WriteToFile("output/scad/right.scad");
