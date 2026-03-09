@@ -463,42 +463,83 @@ int main(int argc, char* argv[]) {
 
     // Cut out hole for type-c
     Shape cylinderHole = Cylinder(20, 1.5, 30).RotateX(90);
-    Shape type_c_hole =
-        Hull(Cube(5.5, 20, 3), cylinderHole.TranslateX(-2.75), cylinderHole.TranslateX(2.75))
-            .RotateZ(-9)
-            .TranslateX(2.7);
+
+    float type_c_cylinder_hole_offset_x = 3.1;
+    float type_c_cylinder_hole_offset_z = 0.2;
+    Shape type_c_hole = Hull(cylinderHole.TranslateX(-type_c_cylinder_hole_offset_x)
+                                 .TranslateZ(-type_c_cylinder_hole_offset_z),
+                             cylinderHole.TranslateX(type_c_cylinder_hole_offset_x)
+                                 .TranslateZ(-type_c_cylinder_hole_offset_z),
+                             cylinderHole.TranslateX(-type_c_cylinder_hole_offset_x)
+                                 .TranslateZ(type_c_cylinder_hole_offset_z),
+                             cylinderHole.TranslateX(type_c_cylinder_hole_offset_x)
+                                 .TranslateZ(type_c_cylinder_hole_offset_z))
+                            .RotateZ(-8.7)
+                            .TranslateX(1.9);
     glm::vec3 type_c_location = d.key_4.GetTopLeft().Apply(kOrigin);
-    type_c_location.z = 6.5;
+    type_c_location.z = 4.8;
     type_c_location.x += 25;
     negative_shapes.push_back(type_c_hole.Translate(type_c_location));
 
     Shape buttonHole = Union(Cylinder(10, 2.5, 30), Cube(2, 10, 5))
                            .RotateY(90)
-                           .RotateZ(12)
+                           .RotateZ(14.175295)
                            .Translate(type_c_location)
-                           .TranslateX(15)
-                           .TranslateY(-5);
+                           .TranslateX(16)
+                           .TranslateY(-11.3);
     Shape button = Union(Cylinder(10, 2.3, 30), Cube(1.8, 9.8, 4.8))
                        .RotateY(90)
-                       .RotateZ(12)
+                       .RotateZ(14.175295)
                        .Translate(type_c_location)
                        .TranslateX(15)
                        .TranslateY(-5);
     negative_shapes.push_back(buttonHole);
 
+    Shape led_hole = Cylinder(10, 0.7, 30)
+                         .RotateY(90)
+                         .RotateZ(14.175295)
+                         .Translate(type_c_location)
+                         .TranslateX(16)
+                         .TranslateY(-4)
+                         .TranslateZ(-0.8);
+    negative_shapes.push_back(led_hole);
+
     Shape result = UnionAll(shapes);
     // Subtracting is expensive to preview and is best to disable while testing.
     result = result.Subtract(UnionAll(negative_shapes));
+
+    // Shape pcb =
+    //     Import("ykb-dactyl-v1.stl", 10).Color("gray").Translate(31.2, 37.8, 1.5).RotateZ(-8.7);
+    // result = Union(result, pcb);
+
+    glm::vec3 boardScrewMountLocation = d.key_5.GetTopRight().Apply(kOrigin);
+    boardScrewMountLocation.z = 5.55;
+    boardScrewMountLocation.x -= 2.7;
+    boardScrewMountLocation.y -= 0.42;
+    Shape boardScrewMount = Union(Cylinder(5, 2, 30), Cube(4, 5, 5).TranslateY(2.5))
+                                .RotateZ(-11)
+                                .Subtract(Cylinder(2.5, 1, 30).TranslateZ(-2.5));
+    Shape boardScrewMount1 = boardScrewMount.Translate(boardScrewMountLocation);
+
+    boardScrewMountLocation.x -= 15.93;
+    boardScrewMountLocation.y += 2.45;
+    Shape boardScrewMount2 = boardScrewMount.Translate(boardScrewMountLocation);
+
+    boardScrewMountLocation = d.key_g.GetBottomRight().Apply(kOrigin);
+    boardScrewMountLocation.z = 5.55;
+    boardScrewMountLocation.x -= 2.58;
+    boardScrewMountLocation.y += 5.19;
+    Shape boardScrewMount3 = boardScrewMount.RotateZ(-80).Translate(boardScrewMountLocation);
+
+    result = Union(result, boardScrewMount1, boardScrewMount2, boardScrewMount3);
 
     std::vector<Shape> bottom_plate_shapes = {result};
     for (Key* key : d.all_keys()) {
         bottom_plate_shapes.push_back(Hull(key->GetSwitch()));
     }
 
-    Shape bottom_plate = UnionAll(bottom_plate_shapes)
-                             .Projection()
-                             .LinearExtrude(1.5)
-                             .Subtract(UnionAll(screw_holes));
+    Shape bottom_plate =
+        UnionAll(bottom_plate_shapes).Projection().LinearExtrude(2).Subtract(UnionAll(screw_holes));
 
     result.WriteToFile("output/scad/left.scad");
     result.MirrorX().WriteToFile("output/scad/right.scad");
