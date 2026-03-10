@@ -419,8 +419,8 @@ int main(int argc, char* argv[]) {
     // Add all the screw inserts.
     std::vector<Shape> screw_holes;
     {
-        double screw_height = 5;
-        double screw_radius = 4.4 / 2.0;
+        double screw_height = 6;
+        double screw_radius = 4.55 / 2.0;
         Shape screw_hole = Cylinder(screw_height + 2, screw_radius, 30);
         Shape screw_insert =
             Cylinder(screw_height, screw_radius + 1.65, 30).TranslateZ(screw_height / 2);
@@ -434,23 +434,45 @@ int main(int argc, char* argv[]) {
         screw_left_top.x += 2.8;
         screw_left_top.y += -.5;
 
-        glm::vec3 screw_right_bottom = d.key_end.GetBottomLeft().Apply(kOrigin);
+        glm::vec3 screw_right_bottom = d.key_end.GetBottomRight().Apply(kOrigin);
         screw_right_bottom.z = 0;
-        screw_right_bottom.y += 3.5;
-        screw_right_bottom.x += 1.5;
+        screw_right_bottom.y += 5.5;
+        screw_right_bottom.x -= 2.5;
 
-        glm::vec3 screw_right_mid = d.key_ctrl.GetTopLeft().Apply(kOrigin);
+        glm::vec3 screw_right_mid_mid = d.key_ctrl.GetTopLeft().Apply(kOrigin);
+        screw_right_mid_mid.z = 0;
+        screw_right_mid_mid.x -= 5;
+        screw_right_mid_mid.y += 8;
+
+        glm::vec3 screw_right_mid = d.key_alt.GetTopRight().Apply(kOrigin);
         screw_right_mid.z = 0;
-        screw_right_mid.y += -.9;
+        screw_right_mid.x -= 6;
+        screw_right_mid.y -= 0;
+
+        glm::vec3 screw_right_top = d.key_4.GetTopLeft().Apply(kOrigin);
+        screw_right_top.z = 0;
+        screw_right_top.x += 8;
+        screw_right_top.y += 3;
+
+        glm::vec3 screw_mid_bottom = d.key_x.GetBottomRight().Apply(kOrigin);
+        screw_mid_bottom.z = 0;
+        screw_mid_bottom.x += 0;
+        screw_mid_bottom.y -= 27;
 
         shapes.push_back(Union(screw_insert.Translate(screw_left_top),
+                               screw_insert.Translate(screw_right_top),
+                               screw_insert.Translate(screw_right_mid_mid),
                                screw_insert.Translate(screw_right_mid),
                                screw_insert.Translate(screw_right_bottom),
+                               screw_insert.Translate(screw_mid_bottom),
                                screw_insert.Translate(screw_left_bottom)));
         screw_holes = {
             screw_hole.Translate(screw_left_top),
+            screw_hole.Translate(screw_right_top),
+            screw_hole.Translate(screw_right_mid_mid),
             screw_hole.Translate(screw_right_mid),
             screw_hole.Translate(screw_right_bottom),
+            screw_hole.Translate(screw_mid_bottom),
             screw_hole.Translate(screw_left_bottom),
         };
     }
@@ -512,22 +534,15 @@ int main(int argc, char* argv[]) {
         Import("ykb-dactyl-v1.stl", 10).Color("gray").Translate(31.2, 37.8, 2.1).RotateZ(-8.7);
     result = Union(result, pcb);
 
-    std::cout << "x: "
-              << d.key_alt.GetTopRight().Apply(kOrigin).x -
-                     d.key_end.GetBottomRight().Apply(kOrigin).x
-              << " y: "
-              << d.key_alt.GetTopRight().Apply(kOrigin).y -
-                     d.key_end.GetBottomRight().Apply(kOrigin).y
-              << std::endl;
     Shape battery =
-        Cube(55, 55, 10).RotateZ(61.82389562).TranslateZ(5).TranslateX(50).TranslateY(-40);
-    result = Union(result, battery);
+        Cube(55, 65, 10).RotateZ(61.82389562).TranslateZ(5).TranslateX(45).TranslateY(-38);
+    result = Union(result, battery.Color("orange"));
 
     glm::vec3 boardScrewMountLocation = d.key_5.GetTopRight().Apply(kOrigin);
     boardScrewMountLocation.z = 9.55;
     boardScrewMountLocation.x -= 2.7;
     boardScrewMountLocation.y -= 0.42;
-    Shape boardScrewMount = Union(Cylinder(13, 2.525, 30), Cube(4, 5, 5).TranslateY(2.5))
+    Shape boardScrewMount = Union(Cylinder(13, 2.8, 30), Cube(5.6, 5, 13).TranslateY(2.5))
                                 .RotateZ(-11)
                                 .Subtract(Cylinder(8, 2.025, 30).TranslateZ(-6.5));
     Shape boardScrewMount1 = boardScrewMount.Translate(boardScrewMountLocation);
