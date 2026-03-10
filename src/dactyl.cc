@@ -508,17 +508,28 @@ int main(int argc, char* argv[]) {
     // Subtracting is expensive to preview and is best to disable while testing.
     result = result.Subtract(UnionAll(negative_shapes));
 
-    // Shape pcb =
-    //     Import("ykb-dactyl-v1.stl", 10).Color("gray").Translate(31.2, 37.8, 1.5).RotateZ(-8.7);
-    // result = Union(result, pcb);
+    Shape pcb =
+        Import("ykb-dactyl-v1.stl", 10).Color("gray").Translate(31.2, 37.8, 2.1).RotateZ(-8.7);
+    result = Union(result, pcb);
+
+    std::cout << "x: "
+              << d.key_alt.GetTopRight().Apply(kOrigin).x -
+                     d.key_end.GetBottomRight().Apply(kOrigin).x
+              << " y: "
+              << d.key_alt.GetTopRight().Apply(kOrigin).y -
+                     d.key_end.GetBottomRight().Apply(kOrigin).y
+              << std::endl;
+    Shape battery =
+        Cube(55, 55, 10).RotateZ(61.82389562).TranslateZ(5).TranslateX(50).TranslateY(-40);
+    result = Union(result, battery);
 
     glm::vec3 boardScrewMountLocation = d.key_5.GetTopRight().Apply(kOrigin);
-    boardScrewMountLocation.z = 5.55;
+    boardScrewMountLocation.z = 9.55;
     boardScrewMountLocation.x -= 2.7;
     boardScrewMountLocation.y -= 0.42;
-    Shape boardScrewMount = Union(Cylinder(5, 2, 30), Cube(4, 5, 5).TranslateY(2.5))
+    Shape boardScrewMount = Union(Cylinder(13, 2.525, 30), Cube(4, 5, 5).TranslateY(2.5))
                                 .RotateZ(-11)
-                                .Subtract(Cylinder(2.5, 1, 30).TranslateZ(-2.5));
+                                .Subtract(Cylinder(8, 2.025, 30).TranslateZ(-6.5));
     Shape boardScrewMount1 = boardScrewMount.Translate(boardScrewMountLocation);
 
     boardScrewMountLocation.x -= 15.93;
@@ -526,7 +537,7 @@ int main(int argc, char* argv[]) {
     Shape boardScrewMount2 = boardScrewMount.Translate(boardScrewMountLocation);
 
     boardScrewMountLocation = d.key_g.GetBottomRight().Apply(kOrigin);
-    boardScrewMountLocation.z = 5.55;
+    boardScrewMountLocation.z = 9.55;
     boardScrewMountLocation.x -= 2.58;
     boardScrewMountLocation.y += 5.19;
     Shape boardScrewMount3 = boardScrewMount.RotateZ(-80).Translate(boardScrewMountLocation);
