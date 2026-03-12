@@ -80,10 +80,11 @@ Shape MakeSwitch(bool add_side_nubs,
         shapes.push_back(side_nub.RotateZ(180));
     }
 
-    Shape boardHook = Cube(1, 3, 1.1).Translate(kWallWidth / 2 + kSwitchWidth / 2 - 0.3, 0, -0.55);
+    Shape boardHook =
+        Cube(0.5, 3, 1.1).Translate(kWallWidth / 2 + kSwitchWidth / 2 - 0.1, 0, -0.55);
 
     boardHook = Union(boardHook,
-                      Polygon({{1, 0}, {1, 0.6}, {2, 0.6}, {2.5, 0}})
+                      Polygon({{1, 0}, {1, 0.6}, {2.3, 0.6}, {2.6, 0}})
                           .LinearExtrude(3)
                           .RotateX(-90)
                           .RotateZ(180)

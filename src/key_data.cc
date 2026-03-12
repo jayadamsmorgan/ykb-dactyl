@@ -74,7 +74,7 @@ KeyData::KeyData(TransformList key_origin) {
         k.add_bottom_board_hook = true;
         k.name = "key_backspace";
         k.SetParent(key_origin);
-        k.SetPosition(60, -9.18, 42.83);
+        k.SetPosition(55, -9.18, 46.83);
         k.t().rz = -25;
         k.t().rx = 15;
         k.t().ry = 15;

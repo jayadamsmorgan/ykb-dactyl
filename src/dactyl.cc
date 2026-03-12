@@ -18,6 +18,8 @@ using namespace scad;
 bool generateTestKeys = false;
 // Add the caps into the stl for testing.
 bool addCaps = false;
+bool addPCB = false;
+bool addBattery = false;
 
 enum class Direction { UP, DOWN, LEFT, RIGHT };
 
@@ -35,6 +37,10 @@ int main(int argc, char* argv[]) {
             generateTestKeys = true;
         } else if (IS_OPT(argv[i], "--add-caps", "-c")) {
             addCaps = true;
+        } else if (IS_OPT(argv[i], "--add-pcb", "-p")) {
+            addPCB = true;
+        } else if (IS_OPT(argv[i], "--add-battery", "-b")) {
+            addBattery = true;
         } else if (IS_OPT(argv[i], "--help", "-h")) {
             std::cout << "Usage: dactyl [<options>]\n" << std::endl;
             std::cout << "Options:" << std::endl;
@@ -441,8 +447,8 @@ int main(int argc, char* argv[]) {
 
         glm::vec3 screw_right_mid_mid = d.key_ctrl.GetTopLeft().Apply(kOrigin);
         screw_right_mid_mid.z = 0;
-        screw_right_mid_mid.x -= 5;
-        screw_right_mid_mid.y += 8;
+        screw_right_mid_mid.x -= 3.5;
+        screw_right_mid_mid.y += 5;
 
         glm::vec3 screw_right_mid = d.key_alt.GetTopRight().Apply(kOrigin);
         screw_right_mid.z = 0;
@@ -457,7 +463,7 @@ int main(int argc, char* argv[]) {
         glm::vec3 screw_mid_bottom = d.key_x.GetBottomRight().Apply(kOrigin);
         screw_mid_bottom.z = 0;
         screw_mid_bottom.x += 0;
-        screw_mid_bottom.y -= 27;
+        screw_mid_bottom.y -= 28;
 
         shapes.push_back(Union(screw_insert.Translate(screw_left_top),
                                screw_insert.Translate(screw_right_top),
@@ -530,13 +536,19 @@ int main(int argc, char* argv[]) {
     // Subtracting is expensive to preview and is best to disable while testing.
     result = result.Subtract(UnionAll(negative_shapes));
 
-    Shape pcb =
-        Import("ykb-dactyl-v1.stl", 10).Color("gray").Translate(31.2, 37.8, 2.1).RotateZ(-8.7);
-    result = Union(result, pcb);
+    if (addPCB) {
+        Shape pcb = Import("../../extra/pcb.stl", 10)
+                        .Color("gray")
+                        .Translate(31.2, 37.8, 2.1)
+                        .RotateZ(-8.7);
+        result = Union(result, pcb);
+    }
 
-    Shape battery =
-        Cube(55, 65, 10).RotateZ(61.82389562).TranslateZ(5).TranslateX(45).TranslateY(-38);
-    result = Union(result, battery.Color("orange"));
+    if (addBattery) {
+        Shape battery =
+            Cube(55, 65, 10).RotateZ(61.82389562).TranslateZ(5).TranslateX(42).TranslateY(-40);
+        result = Union(result, battery.Color("orange"));
+    }
 
     glm::vec3 boardScrewMountLocation = d.key_5.GetTopRight().Apply(kOrigin);
     boardScrewMountLocation.z = 9.55;
