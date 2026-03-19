@@ -542,9 +542,9 @@ int main(int argc, char* argv[]) {
         result = Union(result, pcb);
     }
 
+    Shape battery =
+        Cube(55, 65, 10).RotateZ(61.82389562).TranslateZ(5).TranslateX(42).TranslateY(-40);
     if (addBattery) {
-        Shape battery =
-            Cube(55, 65, 10).RotateZ(61.82389562).TranslateZ(5).TranslateX(42).TranslateY(-40);
         result = Union(result, battery.Color("orange"));
     }
 
@@ -569,39 +569,66 @@ int main(int argc, char* argv[]) {
 
     result = Union(result, boardScrewMount1, boardScrewMount2, boardScrewMount3);
 
-    std::vector<Shape> bottom_plate_shapes = {result};
-    for (Key* key : d.all_keys()) {
-        bottom_plate_shapes.push_back(Hull(key->GetSwitch()));
-    }
-
-    Shape bottom_plate =
-        UnionAll(bottom_plate_shapes).Projection().LinearExtrude(2).Subtract(UnionAll(screw_holes));
-    Shape screw_head_hole = Cylinder({
-        .h = 1.75,
-        .r1 = 2.9,
-        .r2 = 2.6,
-        .fn = 30,
-    });
-
-    Shape rubber_feet_hole = Cylinder(0.3, 2.5, 30);
-
-    // screw_left_bottom.z = -0.9;
-    // bottom_plate = bottom_plate.Subtract(rubber_feet_hole.Translate(screw_left_bottom));
-    bottom_plate =
-        bottom_plate.Subtract(screw_head_hole.Translate(screw_left_bottom).TranslateZ(-0.25 / 2));
-
     result.WriteToFile("output/scad/left.scad");
     result.MirrorX().WriteToFile("output/scad/right.scad");
 
     std::cout << "Done." << std::endl;
 
     // Bottom plate
-    {
-        std::cout << "Generating bottom plates..." << std::endl;
-        bottom_plate.WriteToFile("output/scad/bottom_left.scad");
-        bottom_plate.MirrorX().WriteToFile("output/scad/bottom_right.scad");
-        std::cout << "Done." << std::endl;
+
+    const double bottom_plate_thickness = 2.0;
+
+    std::vector<Shape> bottom_plate_shapes = {result};
+    for (Key* key : d.all_keys()) {
+        bottom_plate_shapes.push_back(Hull(key->GetSwitch()));
     }
+
+    std::vector<Shape> rubber_feet_holes;
+    const double rubber_feet_hole_thickness = 0.3;
+    Shape rubber_feet_hole = Cylinder(rubber_feet_hole_thickness, 4.2, 30);
+    double rubber_feet_z = -(bottom_plate_thickness - rubber_feet_hole_thickness) / 2;
+    rubber_feet_holes = {
+        rubber_feet_hole.Translate(screw_left_top).TranslateZ(rubber_feet_z),
+        rubber_feet_hole.Translate(screw_right_top).TranslateZ(rubber_feet_z),
+        rubber_feet_hole.Translate(screw_right_mid_mid).TranslateZ(rubber_feet_z),
+        rubber_feet_hole.Translate(screw_right_mid).TranslateZ(rubber_feet_z),
+        rubber_feet_hole.Translate(screw_right_bottom).TranslateZ(rubber_feet_z),
+        rubber_feet_hole.Translate(screw_mid_bottom).TranslateZ(rubber_feet_z),
+        rubber_feet_hole.Translate(screw_left_bottom).TranslateZ(rubber_feet_z),
+    };
+
+    std::vector<Shape> screw_head_holes;
+    const double screw_head_hole_height = 1.75;
+    Shape screw_head_hole = Cylinder({
+        .h = screw_head_hole_height,
+        .r1 = 2.9,
+        .r2 = 2.6,
+        .fn = 30,
+    });
+    double screw_head_z =
+        -(bottom_plate_thickness - screw_head_hole_height) / 2 + rubber_feet_hole_thickness;
+    screw_head_holes = {
+        screw_head_hole.Translate(screw_left_top).TranslateZ(screw_head_z),
+        screw_head_hole.Translate(screw_right_top).TranslateZ(screw_head_z),
+        screw_head_hole.Translate(screw_right_mid_mid).TranslateZ(screw_head_z),
+        screw_head_hole.Translate(screw_right_mid).TranslateZ(screw_head_z),
+        screw_head_hole.Translate(screw_right_bottom).TranslateZ(screw_head_z),
+        screw_head_hole.Translate(screw_mid_bottom).TranslateZ(screw_head_z),
+        screw_head_hole.Translate(screw_left_bottom).TranslateZ(screw_head_z),
+    };
+
+    Shape bottom_plate = UnionAll(bottom_plate_shapes)
+                             .Projection()
+                             .LinearExtrude(bottom_plate_thickness)
+                             .Subtract(UnionAll(screw_holes))
+                             .Subtract(UnionAll(screw_head_holes))
+                             .Subtract(UnionAll(rubber_feet_holes))
+                             .Subtract(battery.TranslateZ(0.5));
+
+    std::cout << "Generating bottom plates..." << std::endl;
+    bottom_plate.WriteToFile("output/scad/bottom_left.scad");
+    bottom_plate.MirrorX().WriteToFile("output/scad/bottom_right.scad");
+    std::cout << "Done." << std::endl;
 
     return 0;
 }
