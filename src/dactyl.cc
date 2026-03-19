@@ -424,64 +424,62 @@ int main(int argc, char* argv[]) {
 
     // Add all the screw inserts.
     std::vector<Shape> screw_holes;
-    {
-        double screw_height = 6;
-        double screw_radius = 4.55 / 2.0;
-        Shape screw_hole = Cylinder(screw_height + 2, screw_radius, 30);
-        Shape screw_insert =
-            Cylinder(screw_height, screw_radius + 1.65, 30).TranslateZ(screw_height / 2);
+    double screw_height = 6;
+    double screw_radius = 4.55 / 2.0;
+    Shape screw_hole = Cylinder(screw_height + 2, screw_radius, 30);
+    Shape screw_insert =
+        Cylinder(screw_height, screw_radius + 1.65, 30).TranslateZ(screw_height / 2);
 
-        glm::vec3 screw_left_bottom = d.key_shift.GetBottomLeft().Apply(kOrigin);
-        screw_left_bottom.z = 0;
-        screw_left_bottom.x += 3.2;
+    glm::vec3 screw_left_bottom = d.key_shift.GetBottomLeft().Apply(kOrigin);
+    screw_left_bottom.z = 0;
+    screw_left_bottom.x += 3.2;
 
-        glm::vec3 screw_left_top = d.key_plus.GetTopLeft().Apply(kOrigin);
-        screw_left_top.z = 0;
-        screw_left_top.x += 2.8;
-        screw_left_top.y += -.5;
+    glm::vec3 screw_left_top = d.key_plus.GetTopLeft().Apply(kOrigin);
+    screw_left_top.z = 0;
+    screw_left_top.x += 2.8;
+    screw_left_top.y += -.5;
 
-        glm::vec3 screw_right_bottom = d.key_end.GetBottomRight().Apply(kOrigin);
-        screw_right_bottom.z = 0;
-        screw_right_bottom.y += 5.5;
-        screw_right_bottom.x -= 2.5;
+    glm::vec3 screw_right_bottom = d.key_end.GetBottomRight().Apply(kOrigin);
+    screw_right_bottom.z = 0;
+    screw_right_bottom.y += 5.5;
+    screw_right_bottom.x -= 2.5;
 
-        glm::vec3 screw_right_mid_mid = d.key_ctrl.GetTopLeft().Apply(kOrigin);
-        screw_right_mid_mid.z = 0;
-        screw_right_mid_mid.x -= 3.5;
-        screw_right_mid_mid.y += 5;
+    glm::vec3 screw_right_mid_mid = d.key_ctrl.GetTopLeft().Apply(kOrigin);
+    screw_right_mid_mid.z = 0;
+    screw_right_mid_mid.x -= 3.5;
+    screw_right_mid_mid.y += 5;
 
-        glm::vec3 screw_right_mid = d.key_alt.GetTopRight().Apply(kOrigin);
-        screw_right_mid.z = 0;
-        screw_right_mid.x -= 6;
-        screw_right_mid.y -= 0;
+    glm::vec3 screw_right_mid = d.key_alt.GetTopRight().Apply(kOrigin);
+    screw_right_mid.z = 0;
+    screw_right_mid.x -= 6;
+    screw_right_mid.y -= 0;
 
-        glm::vec3 screw_right_top = d.key_4.GetTopLeft().Apply(kOrigin);
-        screw_right_top.z = 0;
-        screw_right_top.x += 8;
-        screw_right_top.y += 3;
+    glm::vec3 screw_right_top = d.key_4.GetTopLeft().Apply(kOrigin);
+    screw_right_top.z = 0;
+    screw_right_top.x += 8;
+    screw_right_top.y += 3;
 
-        glm::vec3 screw_mid_bottom = d.key_x.GetBottomRight().Apply(kOrigin);
-        screw_mid_bottom.z = 0;
-        screw_mid_bottom.x += 0;
-        screw_mid_bottom.y -= 28;
+    glm::vec3 screw_mid_bottom = d.key_x.GetBottomRight().Apply(kOrigin);
+    screw_mid_bottom.z = 0;
+    screw_mid_bottom.x += 0;
+    screw_mid_bottom.y -= 28;
 
-        shapes.push_back(Union(screw_insert.Translate(screw_left_top),
-                               screw_insert.Translate(screw_right_top),
-                               screw_insert.Translate(screw_right_mid_mid),
-                               screw_insert.Translate(screw_right_mid),
-                               screw_insert.Translate(screw_right_bottom),
-                               screw_insert.Translate(screw_mid_bottom),
-                               screw_insert.Translate(screw_left_bottom)));
-        screw_holes = {
-            screw_hole.Translate(screw_left_top),
-            screw_hole.Translate(screw_right_top),
-            screw_hole.Translate(screw_right_mid_mid),
-            screw_hole.Translate(screw_right_mid),
-            screw_hole.Translate(screw_right_bottom),
-            screw_hole.Translate(screw_mid_bottom),
-            screw_hole.Translate(screw_left_bottom),
-        };
-    }
+    shapes.push_back(Union(screw_insert.Translate(screw_left_top),
+                           screw_insert.Translate(screw_right_top),
+                           screw_insert.Translate(screw_right_mid_mid),
+                           screw_insert.Translate(screw_right_mid),
+                           screw_insert.Translate(screw_right_bottom),
+                           screw_insert.Translate(screw_mid_bottom),
+                           screw_insert.Translate(screw_left_bottom)));
+    screw_holes = {
+        screw_hole.Translate(screw_left_top),
+        screw_hole.Translate(screw_right_top),
+        screw_hole.Translate(screw_right_mid_mid),
+        screw_hole.Translate(screw_right_mid),
+        screw_hole.Translate(screw_right_bottom),
+        screw_hole.Translate(screw_mid_bottom),
+        screw_hole.Translate(screw_left_bottom),
+    };
 
     std::vector<Shape> negative_shapes;
     AddShapes(&negative_shapes, screw_holes);
@@ -578,6 +576,19 @@ int main(int argc, char* argv[]) {
 
     Shape bottom_plate =
         UnionAll(bottom_plate_shapes).Projection().LinearExtrude(2).Subtract(UnionAll(screw_holes));
+    Shape screw_head_hole = Cylinder({
+        .h = 1.75,
+        .r1 = 2.9,
+        .r2 = 2.6,
+        .fn = 30,
+    });
+
+    Shape rubber_feet_hole = Cylinder(0.3, 2.5, 30);
+
+    // screw_left_bottom.z = -0.9;
+    // bottom_plate = bottom_plate.Subtract(rubber_feet_hole.Translate(screw_left_bottom));
+    bottom_plate =
+        bottom_plate.Subtract(screw_head_hole.Translate(screw_left_bottom).TranslateZ(-0.25 / 2));
 
     result.WriteToFile("output/scad/left.scad");
     result.MirrorX().WriteToFile("output/scad/right.scad");
