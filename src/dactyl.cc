@@ -20,6 +20,7 @@ bool generateTestKeys = false;
 bool addCaps = false;
 bool addPCB = false;
 bool addBattery = false;
+bool addButton = false;
 
 enum class Direction { UP, DOWN, LEFT, RIGHT };
 
@@ -41,6 +42,8 @@ int main(int argc, char* argv[]) {
             addPCB = true;
         } else if (IS_OPT(argv[i], "--add-battery", "-b")) {
             addBattery = true;
+        } else if (IS_OPT(argv[i], "--add-button", "-e")) {
+            addButton = true;
         } else if (IS_OPT(argv[i], "--help", "-h")) {
             std::cout << "Usage: dactyl [<options>]\n" << std::endl;
             std::cout << "Options:" << std::endl;
@@ -489,9 +492,8 @@ int main(int argc, char* argv[]) {
 
     // Cut out hole for type-c
     Shape cylinderHole = Cylinder(20, 1.5, 30).RotateX(90);
-
-    float type_c_cylinder_hole_offset_x = 3.1;
-    float type_c_cylinder_hole_offset_z = 0.2;
+    float type_c_cylinder_hole_offset_x = 3.3;
+    float type_c_cylinder_hole_offset_z = 0.3;
     Shape type_c_hole = Hull(cylinderHole.TranslateX(-type_c_cylinder_hole_offset_x)
                                  .TranslateZ(-type_c_cylinder_hole_offset_z),
                              cylinderHole.TranslateX(type_c_cylinder_hole_offset_x)
@@ -514,11 +516,13 @@ int main(int argc, char* argv[]) {
                            .TranslateX(16)
                            .TranslateY(-11.3);
     Shape button = Union(Cylinder(10, 2.3, 30), Cube(1.8, 9.8, 4.8))
+                       .Subtract(Cube(10, 10, 10).TranslateZ(-4.4))
+                       .Subtract(Cube(5, 5, 5).TranslateZ(0).TranslateX(3.7))
                        .RotateY(90)
                        .RotateZ(14.175295)
                        .Translate(type_c_location)
-                       .TranslateX(15)
-                       .TranslateY(-5);
+                       .TranslateX(16)
+                       .TranslateY(-11.3);
     negative_shapes.push_back(buttonHole);
 
     Shape led_hole = Cylinder(10, 0.7, 30)
@@ -531,14 +535,17 @@ int main(int argc, char* argv[]) {
     negative_shapes.push_back(led_hole);
 
     Shape result = UnionAll(shapes);
-    // Subtracting is expensive to preview and is best to disable while testing.
     result = result.Subtract(UnionAll(negative_shapes));
+    if (addButton) {
+        result = Union(result, button);
+    }
 
     if (addPCB) {
         Shape pcb = Import("../../extra/pcb.stl", 10)
+                        .MirrorX()
                         .Color("gray")
-                        .Translate(31.2, 37.8, 2.1)
-                        .RotateZ(-8.7);
+                        .RotateZ(-8.7)
+                        .Translate(36.55, 32.6, 2.1);
         result = Union(result, pcb);
     }
 
@@ -552,7 +559,7 @@ int main(int argc, char* argv[]) {
     boardScrewMountLocation.z = 9.55;
     boardScrewMountLocation.x -= 2.7;
     boardScrewMountLocation.y -= 0.42;
-    Shape boardScrewMount = Union(Cylinder(13, 2.8, 30), Cube(5.6, 5, 13).TranslateY(2.5))
+    Shape boardScrewMount = Union(Cylinder(13, 2.5, 30), Cube(5, 5, 13).TranslateY(2.5))
                                 .RotateZ(-11)
                                 .Subtract(Cylinder(8, 2.025, 30).TranslateZ(-6.5));
     Shape boardScrewMount1 = boardScrewMount.Translate(boardScrewMountLocation);
@@ -572,6 +579,10 @@ int main(int argc, char* argv[]) {
     result.WriteToFile("output/scad/left.scad");
     result.MirrorX().WriteToFile("output/scad/right.scad");
 
+    std::cout << "Done." << std::endl;
+
+    std::cout << "Generating button..." << std::endl;
+    button.WriteToFile("output/scad/button.scad");
     std::cout << "Done." << std::endl;
 
     // Bottom plate
@@ -602,7 +613,7 @@ int main(int argc, char* argv[]) {
     Shape screw_head_hole = Cylinder({
         .h = screw_head_hole_height,
         .r1 = 2.9,
-        .r2 = 2.6,
+        .r2 = 1.4,
         .fn = 30,
     });
     double screw_head_z =
@@ -620,7 +631,7 @@ int main(int argc, char* argv[]) {
     Shape bottom_plate = UnionAll(bottom_plate_shapes)
                              .Projection()
                              .LinearExtrude(bottom_plate_thickness)
-                             .Subtract(UnionAll(screw_holes))
+                             // .Subtract(UnionAll(screw_holes))
                              .Subtract(UnionAll(screw_head_holes))
                              .Subtract(UnionAll(rubber_feet_holes))
                              .Subtract(battery.TranslateZ(0.5));
